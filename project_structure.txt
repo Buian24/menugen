@@ -1,0 +1,22 @@
+
+menugen/
+├── app/
+│   ├── __init__.py
+│   ├── routes.py          # Flask routes chính
+│   ├── parser.py          # Parse Excel → dict
+│   ├── renderer.py        # Render PDF/PNG từ template
+│   ├── templates/
+│   │   ├── index.html     # Landing + upload form
+│   │   ├── preview.html   # Preview menu
+│   │   └── menu_template/ # HTML templates cho menu
+│   │       ├── classic.html
+│   │       └── modern.html
+│   └── static/
+│       ├── css/style.css
+│       └── sample.xlsx    # File mẫu cho user tải
+├── uploads/               # File upload tạm
+├── outputs/               # PDF/PNG xuất ra
+├── Dockerfile
+├── docker-compose.yml
+├── requirements.txt
+└── run.py

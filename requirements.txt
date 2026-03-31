@@ -1,0 +1,9 @@
+Flask
+Flask-SQLAlchemy
+gunicorn
+openpyxl
+pandas
+payos
+python-dotenv
+weasyprint
+werkzeug

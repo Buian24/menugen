@@ -1,0 +1,5 @@
+PS C:\WINDOWS\system32> cloudflared tunnel create menugen
+Tunnel credentials written to C:\Users\Admin\.cloudflared\138fc781-bfcd-4fa5-9d2a-0f1123ce1910.json. cloudflared chose this file based on where your origin certificate was found. Keep this file secret. To revoke these credentials, delete the tunnel.
+
+Created tunnel menugen with id 138fc781-bfcd-4fa5-9d2a-0f1123ce1910
+PS C:\WINDOWS\system32>

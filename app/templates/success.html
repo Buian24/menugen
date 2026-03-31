@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu Hoàn Thiện - {{ order.shop_name }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        .success-icon {
+            color: #28a745;
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+        .download-btn {
+            display: inline-block;
+            padding: 15px 30px;
+            font-size: 18px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: 0.3s;
+            margin: 20px 0;
+        }
+        .download-btn:hover { background-color: #0056b3; }
+
+        /* Responsive cho di động */
+        @media (max-width: 768px) {
+            .container { padding: 10px; }
+            .download-btn { width: 100%; box-sizing: border-box; }
+        }
+        
+        #pdf-viewer {
+            overflow-y: auto;
+            height: 800px;
+            background: #525659;
+            text-align: center;
+            padding-top: 10px;
+        }
+        #pdf-viewer canvas {
+            max-width: 100%;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+    <!-- Thư viện PDF.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="success-icon">✓</div>
+    <h2>Thanh toán thành công!</h2>
+    <p>Cảm ơn bạn. Đây là bản Menu đầy đủ, sắc nét và không có đóng dấu (Watermark).</p>
+    
+    <a href="/download/paid/{{ order.id }}?token={{ token }}" class="download-btn">Tải xuống Menu (PDF)</a>
+    
+    <div style="border: 1px solid #ddd; border-radius: 4px; overflow: hidden; margin-top: 20px;">
+        <div id="pdf-viewer"><p style="color:white; margin-top:20px;">Đang tải menu...</p></div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const url = '/preview/{{ pdf_file }}';
+        const pdfViewer = document.getElementById('pdf-viewer');
+
+        pdfjsLib.getDocument(url).promise.then(async pdf => {
+            pdfViewer.innerHTML = '';
+            for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                const page = await pdf.getPage(pageNum);
+                const canvas = document.createElement('canvas');
+                pdfViewer.appendChild(canvas);
+                
+                const context = canvas.getContext('2d');
+                const viewport = page.getViewport({scale: 1.5});
+                
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                await page.render(renderContext).promise;
+            }
+        }).catch(err => {
+            console.error('Lỗi hiển thị PDF:', err);
+            pdfViewer.innerHTML = '<p style="color: white; padding: 20px;">Không thể tải chế độ xem trực tiếp, vui lòng nhấn nút Tải xuống ở trên.</p>';
+        });
+    });
+</script>
+
+</body>
+</html>

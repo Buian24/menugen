@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xem trước Menu - {{ shop_name }}</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            gap: 20px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .preview-section {
+            flex: 2;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            position: relative;
+        }
+        .info-section {
+            flex: 1;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        h2 { margin-top: 0; color: #333; }
+        .summary-item {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .price {
+            font-size: 24px;
+            font-weight: bold;
+            color: #d9534f;
+            margin: 20px 0;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover { background-color: #218838; }
+        button:disabled { background-color: #6c757d; cursor: not-allowed; }
+        
+        /* Lớp phủ chống chụp màn hình và chống tải */
+        .watermark-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: repeating-linear-gradient(45deg, rgba(255,0,0,0.05) 0, rgba(255,0,0,0.05) 2px, transparent 2px, transparent 50px);
+            display: flex;
+            align-items: flex-start;
+            padding-top: 150px;
+            justify-content: center;
+            pointer-events: none; /* Cho phép cuộn chuột xuyên qua */
+            z-index: 10;
+        }
+
+        /* Responsive cho thiết bị di động */
+        @media (max-width: 768px) {
+            .container { flex-direction: column; }
+            /* Đẩy nút thanh toán lên trên cùng để dễ bấm trên điện thoại */
+            .info-section { order: 1; }
+            .preview-section { order: 2; }
+            .watermark-overlay h1 { font-size: 40px !important; }
+        }
+
+        /* Styles cho PDF.js viewer */
+        #pdf-viewer {
+            overflow-y: auto;
+            height: 700px;
+            background: #525659;
+            text-align: center;
+            padding-top: 10px;
+        }
+        #pdf-viewer canvas {
+            max-width: 100%;
+            margin-bottom: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+    <!-- Thư viện PDF.js để hiển thị PDF trên mọi thiết bị (đặc biệt là Mobile) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <!-- Khung xem trước PDF -->
+    <div class="preview-section" oncontextmenu="return false;">
+        <div class="watermark-overlay">
+            <h1 style="color: rgba(255,0,0,0.4); font-size: 60px; transform: rotate(-15deg); white-space: nowrap; font-weight: bold; letter-spacing: 5px;">BẢN PREVIEW</h1>
+        </div>
+        <div id="pdf-viewer"><p style="color:white; margin-top:20px;">Đang tải bản xem trước...</p></div>
+    </div>
+
+    <!-- Khung thông tin và thanh toán -->
+    <div class="info-section">
+        <h2>Thông tin đơn hàng</h2>
+        <div class="summary-item"><strong>Quán:</strong> {{ shop_name }}</div>
+        <div class="summary-item"><strong>Tổng số món:</strong> {{ total_items }}</div>
+        <div class="summary-item"><strong>Mã đơn hàng:</strong> #{{ order_id }}</div>
+        
+        <div class="price">Tổng tiền: 20.000 VNĐ</div>
+        
+        <button id="pay-btn">Thanh toán qua mã VietQR</button>
+        <p style="font-size: 13px; color: #666; margin-top: 15px; text-align: center;">
+            Hệ thống sẽ mở tab mới để thanh toán. Vui lòng không đóng trang này để tự động nhận file sau khi chuyển khoản thành công.
+        </p>
+        
+        <p style="font-size: 14px; color: #d9534f; margin-top: 15px; background: #fdf2f2; padding: 10px; border-radius: 5px; border: 1px solid #f5c6cb;">
+            <strong>Lưu ý:</strong> Dòng chữ "BẢN PREVIEW" và các gạch sọc mờ chỉ là lớp bảo vệ. Chúng sẽ <b>hoàn toàn biến mất</b>, trả lại cho bạn file PDF menu sắc nét, nguyên bản ngay sau khi thanh toán thành công!
+        </p>
+    </div>
+</div>
+
+<script>
+    document.getElementById('pay-btn').addEventListener('click', async function() {
+        const btn = this;
+        btn.disabled = true;
+        btn.innerText = 'Đang tạo link thanh toán...';
+
+        try {
+            // 1. Gọi API để tạo link thanh toán PayOS
+            const response = await fetch(`/payment/payos/{{ order_id }}`, { method: 'POST' });
+            const data = await response.json();
+
+            if (data.success) {
+                // Mở trang quét mã QR của PayOS ở tab mới
+                window.open(data.checkout_url, '_blank');
+                btn.innerText = 'Đang chờ bạn thanh toán... (Tự động kiểm tra)';
+
+                let attempts = 0;
+                const maxAttempts = 300; // 300 lần * 3s = 900s (15 phút)
+                
+                // 2. Bắt đầu vòng lặp kiểm tra đơn hàng mỗi 3 giây
+                let checkInterval = setInterval(async () => {
+                    attempts++;
+                    if (attempts > maxAttempts) {
+                        clearInterval(checkInterval);
+                        btn.innerText = 'Hết thời gian chờ thanh toán. Vui lòng tải lại trang.';
+                        return;
+                    }
+                    try {
+                        let res = await fetch(`/api/check-order/{{ order_id }}`);
+                        let statusData = await res.json();
+                        
+                        // 3. Nếu trạng thái đã đổi thành PAID -> Tự động tải file
+                        if (statusData.status === 'PAID') {
+                            clearInterval(checkInterval);
+                            alert('Giao dịch thành công! Chuyển sang trang tải file Menu...');
+                            btn.innerText = 'Đã thanh toán thành công!';
+                            btn.style.backgroundColor = '#17a2b8'; // Đổi màu thành xanh dương
+                            
+                            // Chuyển hướng sang trang xem full và tải file
+                            window.location.href = statusData.success_url;
+                        }
+                    } catch (err) {
+                        console.error('Lỗi khi kiểm tra trạng thái:', err);
+                    }
+                }, 3000);
+
+            } else {
+                alert('Lỗi khởi tạo thanh toán: ' + data.msg);
+                btn.disabled = false;
+                btn.innerText = 'Thanh toán qua mã VietQR';
+            }
+        } catch (error) {
+            alert('Không thể kết nối tới server. Vui lòng thử lại.');
+            btn.disabled = false;
+            btn.innerText = 'Thanh toán qua mã VietQR';
+        }
+    });
+
+    // --- Logic hiển thị PDF bằng PDF.js ---
+    document.addEventListener("DOMContentLoaded", function() {
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        
+        const url = '/preview/{{ pdf_file }}';
+        const pdfViewer = document.getElementById('pdf-viewer');
+
+        pdfjsLib.getDocument(url).promise.then(async pdf => {
+            pdfViewer.innerHTML = ''; // Xóa chữ Đang tải...
+            for(let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+                const page = await pdf.getPage(pageNum);
+                const canvas = document.createElement('canvas');
+                pdfViewer.appendChild(canvas);
+                
+                const context = canvas.getContext('2d');
+                const viewport = page.getViewport({scale: 1.5}); // Scale 1.5 cho ảnh nét
+                
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                const renderContext = {
+                    canvasContext: context,
+                    viewport: viewport
+                };
+                await page.render(renderContext).promise;
+            }
+        }).catch(err => {
+            console.error('Lỗi hiển thị PDF:', err);
+            pdfViewer.innerHTML = '<p style="color: white; padding: 20px;">Lỗi tải file xem trước.</p>';
+        });
+    });
+</script>
+
+</body>
+</html>

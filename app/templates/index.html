@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MenuGen AI – Tạo menu đẹp từ Excel</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', sans-serif; background: #f8fafc; color: #1e293b; }
+  .hero { background: linear-gradient(135deg, #1e3a5f, #2E86AB);
+          color: white; padding: 60px 20px; text-align: center; }
+  .hero h1 { font-size: 2.2rem; margin-bottom: 12px; }
+  .hero p  { font-size: 1.1rem; opacity: 0.9; margin-bottom: 24px; }
+  .badge   { background: #f59e0b; color: #000; padding: 6px 16px;
+             border-radius: 20px; font-weight: bold; font-size: 0.9rem; }
+  .card    { background: white; border-radius: 16px; padding: 32px;
+             max-width: 560px; margin: -30px auto 40px; box-shadow: 0 8px 32px rgba(0,0,0,.1); }
+  .card h2 { margin-bottom: 20px; color: #1e3a5f; }
+  label    { display: block; font-weight: 600; margin: 12px 0 4px; }
+  input, select { width: 100%; padding: 10px 14px; border: 1.5px solid #cbd5e1;
+                  border-radius: 8px; font-size: 1rem; }
+  .upload-area { border: 2px dashed #2E86AB; border-radius: 12px; padding: 28px;
+                 text-align: center; cursor: pointer; background: #f0f9ff; margin: 12px 0; }
+  .upload-area p { color: #64748b; margin-top: 8px; font-size: 0.9rem; }
+  .btn-primary { width: 100%; padding: 14px; background: #1e3a5f; color: white;
+                 border: none; border-radius: 10px; font-size: 1.1rem;
+                 font-weight: bold; cursor: pointer; margin-top: 16px; }
+  .btn-primary:hover { background: #2E86AB; }
+  .sample-link { text-align: center; margin-top: 12px; }
+  .sample-link a { color: #2E86AB; text-decoration: none; font-size: 0.9rem; }
+  .flash-error { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b;
+                 padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; }
+  .features { display: flex; gap: 16px; justify-content: center;
+              flex-wrap: wrap; padding: 0 20px 40px; max-width: 700px; margin: 0 auto; }
+  .feature  { background: white; border-radius: 12px; padding: 20px; flex: 1;
+              min-width: 180px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
+  .feature .icon { font-size: 2rem; margin-bottom: 8px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <h1>🍜 MenuGen AI</h1>
+  <p>Tạo menu quán ăn chuyên nghiệp từ Excel – chỉ 30 giây!</p>
+  <span class="badge">⚡ Chỉ từ 20.000đ / lượt</span>
+</div>
+
+<div class="card">
+  <h2>📤 Upload file Excel của bạn</h2>
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for category, message in messages %}
+      <div class="flash-{{ category }}">{{ message }}</div>
+    {% endfor %}
+  {% endwith %}
+
+  <form method="POST" action="/upload" enctype="multipart/form-data">
+    <label>Tên quán / thương hiệu</label>
+    <input type="text" name="shop_name" placeholder="Ví dụ: Phở Hà Nội, Cafe 365..." required>
+
+    <label>Chọn style menu</label>
+    <select name="template">
+      <option value="classic">🟤 Classic Ấm Áp – Quán ăn truyền thống</option>
+      <!--<option value="modern">🔵 Modern 2 Cột – Cafe, nhà hàng</option>
+      <option value="fnb">🟢 F&B Tươi Mát – Trà sữa, đồ uống</option>
+      <option value="dark">🟡 Dark Luxury – Fine dining cao cấp</option>
+      <option value="rustic">⬛ Rustic Chalk – Vỉa hè, BBQ</option>
+      <option value="japanese">🔴 Japanese Minimal – Sushi, ramen</option>
+      <option value="pastel">🩷 Pastel Cafe – Cafe sáng, bánh ngọt</option>
+      <option value="street">🟠 Street Food – Bún bò, bánh mì</option> -->
+      <option value="viet_truyenthong">🟤 Việt Truyền Thống (Nâu/Kem) – Phù hợp: Phở, Bún, Cơm niêu, Quán ăn gia đình</option>
+      <option value="quan_nhau">🟡 Bia & BBQ (Đen/Vàng) – Phù hợp: Quán nhậu, Nướng, Lẩu, Phố đêm</option>
+      <option value="tra_sua">🟢 Tươi Sáng Bo Tròn (Xanh/Hồng) – Phù hợp: Trà sữa, Ăn vặt, Sinh tố, Chè</option>
+      <option value="cafe_modern">⚪ Tối Giản Hiện Đại (Trắng/Đen) – Phù hợp: Cafe nguyên chất, Nhà hàng, Bakery</option>
+    </select>
+
+    <label>File Excel (.xlsx)</label>
+    <div class="upload-area" onclick="document.getElementById('excel_file').click()">
+      <div style="font-size:2.5rem">📊</div>
+      <strong>Kéo thả hoặc click để chọn file</strong>
+      <p>Hỗ trợ .xlsx, .xls – tối đa 5MB</p>
+      <p id="file-chosen" style="color:#1e3a5f;font-weight:600;"></p>
+    </div>
+    <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls"
+           style="display:none" onchange="document.getElementById('file-chosen').textContent=this.files[0].name">
+
+    <button type="submit" class="btn-primary">✨ Tạo menu ngay (Xem preview miễn phí)</button>
+  </form>
+
+  <div class="sample-link">
+    <a href="/download-sample">📥 Tải file Excel mẫu</a>
+  </div>
+</div>
+
+<div class="features">
+  <div class="feature"><div class="icon">⚡</div><strong>30 giây</strong><p>Upload → preview ngay</p></div>
+  <div class="feature"><div class="icon">🎨</div><strong>3 style</strong><p>Classic, Modern, F&B</p></div>
+  <div class="feature"><div class="icon">💰</div><strong>20k/lượt</strong><p>Không thuê bao</p></div>
+</div>
+
+</body>
+</html>

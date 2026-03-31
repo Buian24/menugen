@@ -1,0 +1,30 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    container_name: menugen_app
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./uploads:/app/uploads
+      - ./outputs:/app/outputs
+    environment:
+      - SECRET_KEY=change-this-in-production
+    networks:
+      - menugen_net
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: menugen_tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    networks:
+      - menugen_net
+    depends_on:
+      - app
+
+networks:
+  menugen_net:
+    driver: bridge

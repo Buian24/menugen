@@ -1,0 +1,68 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">
+<style>
+@page { size: A4; margin: 1.4cm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* WATERMARK: lặp lại toàn trang, không thể tránh */
+  {% if watermark %}
+  body::before {
+    content: "PREVIEW · CHƯA THANH TOÁN · PREVIEW · CHƯA THANH TOÁN · PREVIEW";
+    position: fixed;
+    top: 0; left: -20%; right: 0; bottom: 0;
+    width: 140%; height: 100%;
+    font-size: 18px; font-weight: 900;
+    color: rgba(200, 30, 30, 0.13);
+    transform: rotate(-35deg);
+    letter-spacing: 6px;
+    pointer-events: none; z-index: 9999;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 3.2;
+    display: flex; align-items: center;
+    overflow: hidden;
+  }
+  body::after {
+    content: "⛔ MENUGEN.VN ⛔ PREVIEW ⛔ MENUGEN.VN ⛔ PREVIEW ⛔ MENUGEN.VN ⛔ PREVIEW ⛔ MENUGEN.VN ⛔ PREVIEW ⛔ MENUGEN.VN ⛔ PREVIEW ⛔";
+    position: fixed;
+    top: 50%; left: -20%;
+    width: 140%;
+    font-size: 14px; font-weight: 900;
+    color: rgba(200, 30, 30, 0.18);
+    transform: translateY(-50%) rotate(-35deg);
+    letter-spacing: 4px;
+    pointer-events: none; z-index: 9998;
+    white-space: pre-wrap;
+    line-height: 4;
+    word-break: break-all;
+  }
+  {% endif %}
+
+
+{%- set total = namespace(n=0) -%}
+{%- for g, items in groups.items() -%}{%- set total.n = total.n + items|length -%}{%- endfor -%}
+{%- if total.n <= 10 -%}{%- set font_main = 14 -%}{%- set font_desc = 11 -%}{%- set pad = 9 -%}
+{%- elif total.n <= 20 -%}{%- set font_main = 13 -%}{%- set font_desc = 10 -%}{%- set pad = 7 -%}
+{%- elif total.n <= 35 -%}{%- set font_main = 11.5 -%}{%- set font_desc = 9 -%}{%- set pad = 5 -%}
+{%- else -%}{%- set font_main = 10 -%}{%- set font_desc = 8 -%}{%- set pad = 3 -%}{%- endif -%}
+
+body { font-family: Arial, sans-serif; background: #F0FFF4; color: #1B3A2D; font-size: {{ font_main }}px; }
+.header { text-align: center; padding: 14px 0 12px; margin-bottom: 14px; }
+.header .icon { font-size: 36px; margin-bottom: 6px; }
+.header h1 { font-size: {{ [font_main+12, 26]|min }}px; color: #1B3A2D; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
+.header .line { width: 50px; height: 3px; background: #52B788; margin: 7px auto; border-radius: 2px; }
+.header .sub { font-size: {{ font_desc }}px; color: #52B788; letter-spacing: 3px; text-transform: uppercase; }
+.group { margin-bottom: 14px; }
+.group-title { display: flex; align-items: center; gap: 7px; margin-bottom: 7px; }
+.group-title .dot { width: 9px; height: 9px; background: #52B788; border-radius: 50%; flex-shrink: 0; }
+.group-title span { font-size: {{ font_main }}px; font-weight: 900; color: #2D6A4F; text-transform: uppercase; letter-spacing: 1px; }
+.group-title::after { content: ''; flex: 1; height: 1.5px; background: #B7E4C7; }
+.grid { display: flex; flex-wrap: wrap; gap: 5px; }
+.item { flex: 0 0 calc(50% - 3px); background: white; border-radius: 7px; padding: {{ pad }}px 9px; border: 1.5px solid #D8F3DC; display: flex; justify-content: space-between; align-items: center; }
+.item-name { font-size: {{ font_main }}px; font-weight: 700; color: #1B3A2D; word-break: break-word; }
+.item-desc { font-size: {{ font_desc - 1 }}px; color: #74C69D; margin-top: 1px; }
+.item-price { font-size: {{ font_main }}px; font-weight: 900; color: #2D6A4F; white-space: nowrap; margin-left: 7px; }
+.footer { text-align: center; margin-top: 14px; font-size: 8.5px; color: #95D5B2; padding-top: 8px; border-top: 1.5px solid #D8F3DC; }
+</style></head><body>
+<div class="header"><div class="icon">🌿</div><h1>{{ shop_name }}</h1><div class="line"></div><div class="sub">Thực Đơn</div></div>
+{% for group_name, items in groups.items() %}<div class="group"><div class="group-title"><div class="dot"></div><span>{{ group_name }}</span></div><div class="grid">{% for item in items %}<div class="item"><div><div class="item-name">{{ item.ten }}</div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div></div>{% endfor %}</div></div>{% endfor %}
+<div class="footer">{% if watermark %}⚠ Bản xem trước – Thanh toán để tải file in chất lượng cao{% else %}Tạo bởi MenuGen AI • menugen.vn{% endif %}</div></body></html>

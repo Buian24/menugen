@@ -1,0 +1,18 @@
+# Môi trường ảo của Python
+venv/
+.venv/
+env/
+
+# File database
+menugen.db
+
+# Các file do người dùng tải lên và file kết quả
+uploads/
+outputs/
+
+# File biến môi trường
+.env
+
+# Các file cache của Python
+__pycache__/
+*.pyc

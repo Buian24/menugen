@@ -35,6 +35,19 @@
   .feature  { background: white; border-radius: 12px; padding: 20px; flex: 1;
               min-width: 180px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,.06); }
   .feature .icon { font-size: 2rem; margin-bottom: 8px; }
+
+  /* Styling cho Tabs và Nhập liệu bằng tay */
+  .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+  .tab-btn { flex: 1; padding: 14px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #475569; transition: 0.2s; font-size: 1rem; }
+  .tab-btn.active { background: #1e3a5f; color: white; }
+  .manual-row { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 16px; border-radius: 8px; margin-bottom: 16px; position: relative; }
+  .manual-row input { margin-bottom: 12px; }
+  .btn-remove { position: absolute; top: 16px; right: 16px; background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+  .btn-remove:hover { background: #dc2626; }
+  .btn-add { background: #10b981; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 16px; font-size: 1rem; }
+  .btn-add:hover { background: #059669; }
+  .flex-row { display: flex; gap: 12px; }
+  .flex-row > div { flex: 1; }
 </style>
 </head>
 <body>
@@ -46,7 +59,7 @@
 </div>
 
 <div class="card">
-  <h2>📤 Upload file Excel của bạn</h2>
+  <h2>🍽️ Khởi tạo Menu của bạn</h2>
 
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% for category, message in messages %}
@@ -54,7 +67,14 @@
     {% endfor %}
   {% endwith %}
 
+  <div class="tabs">
+    <button type="button" class="tab-btn active" onclick="switchTab('excel', this)">📤 Tải từ Excel</button>
+    <button type="button" class="tab-btn" onclick="switchTab('manual', this)">✏️ Nhập trực tiếp</button>
+  </div>
+
   <form method="POST" action="/upload" enctype="multipart/form-data">
+    <input type="hidden" name="input_method" id="input_method" value="excel">
+
     <label>Tên quán / thương hiệu</label>
     <input type="text" name="shop_name" placeholder="Ví dụ: Phở Hà Nội, Cafe 365..." required>
 
@@ -74,22 +94,29 @@
       <option value="cafe_modern">⚪ Tối Giản Hiện Đại (Trắng/Đen) – Phù hợp: Cafe nguyên chất, Nhà hàng, Bakery</option>
     </select>
 
-    <label>File Excel (.xlsx)</label>
-    <div class="upload-area" onclick="document.getElementById('excel_file').click()">
-      <div style="font-size:2.5rem">📊</div>
-      <strong>Kéo thả hoặc click để chọn file</strong>
-      <p>Hỗ trợ .xlsx, .xls – tối đa 5MB</p>
-      <p id="file-chosen" style="color:#1e3a5f;font-weight:600;"></p>
+    <div id="section-excel">
+      <label>File Excel (.xlsx)</label>
+      <div class="upload-area" onclick="document.getElementById('excel_file').click()">
+        <div style="font-size:2.5rem">📊</div>
+        <strong>Kéo thả hoặc click để chọn file</strong>
+        <p>Hỗ trợ .xlsx, .xls – tối đa 5MB</p>
+        <p id="file-chosen" style="color:#1e3a5f;font-weight:600;"></p>
+      </div>
+      <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls"
+             style="display:none" onchange="document.getElementById('file-chosen').textContent=this.files[0].name" required>
+      
+      <div class="sample-link">
+        <a href="/download-sample">📥 Tải file Excel mẫu</a>
+      </div>
     </div>
-    <input type="file" id="excel_file" name="excel_file" accept=".xlsx,.xls"
-           style="display:none" onchange="document.getElementById('file-chosen').textContent=this.files[0].name">
+
+    <div id="section-manual" style="display: none; margin-top: 16px;">
+      <div id="manual-items-container"></div>
+      <button type="button" class="btn-add" onclick="addManualItem()">+ Thêm món ăn mới</button>
+    </div>
 
     <button type="submit" class="btn-primary">✨ Tạo menu ngay (Xem preview miễn phí)</button>
   </form>
-
-  <div class="sample-link">
-    <a href="/download-sample">📥 Tải file Excel mẫu</a>
-  </div>
 </div>
 
 <div class="features">
@@ -97,6 +124,58 @@
   <div class="feature"><div class="icon">🎨</div><strong>3 style</strong><p>Classic, Modern, F&B</p></div>
   <div class="feature"><div class="icon">💰</div><strong>20k/lượt</strong><p>Không thuê bao</p></div>
 </div>
+
+<script>
+  let itemIndex = 0;
+
+  function switchTab(tab, btnElement) {
+    document.getElementById('input_method').value = tab;
+    
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    if (btnElement) btnElement.classList.add('active');
+    
+    if (tab === 'excel') {
+      document.getElementById('section-excel').style.display = 'block';
+      document.getElementById('section-manual').style.display = 'none';
+      document.getElementById('excel_file').required = true;
+    } else {
+      document.getElementById('section-excel').style.display = 'none';
+      document.getElementById('section-manual').style.display = 'block';
+      document.getElementById('excel_file').required = false;
+      
+      if (document.getElementById('manual-items-container').children.length === 0) {
+        addManualItem();
+      }
+    }
+  }
+
+  function addManualItem() {
+    const container = document.getElementById('manual-items-container');
+    const row = document.createElement('div');
+    row.className = 'manual-row';
+    row.innerHTML = `
+      <button type="button" class="btn-remove" onclick="this.parentElement.remove()">Xóa</button>
+      <label>Tên món (*)</label>
+      <input type="text" name="items[${itemIndex}][ten_mon]" placeholder="VD: Phở Bò" required>
+      
+      <div class="flex-row">
+        <div>
+          <label>Giá tiền (*)</label>
+          <input type="number" name="items[${itemIndex}][gia]" placeholder="VD: 50000" required>
+        </div>
+        <div>
+          <label>Nhóm món</label>
+          <input type="text" name="items[${itemIndex}][nhom]" placeholder="VD: Món nước">
+        </div>
+      </div>
+      
+      <label>Mô tả (không bắt buộc)</label>
+      <input type="text" name="items[${itemIndex}][mo_ta]" placeholder="VD: Kèm quẩy và trà đá">
+    `;
+    container.appendChild(row);
+    itemIndex++;
+  }
+</script>
 
 </body>
 </html>

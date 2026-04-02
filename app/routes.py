@@ -13,6 +13,7 @@ from .renderer import render_menu_pdf
 from .models import db, Order
 from payos import PayOS
 from payos.type import ItemData, PaymentData
+import pandas as pd
 
 main = Blueprint('main', __name__)
 
@@ -33,16 +34,12 @@ def get_order_token(order_id):
     return hmac.new(secret, str(order_id).encode('utf-8'), hashlib.sha256).hexdigest()[:16]
 
 def parse_manual_form(form_data):
-    """Hàm mới để xử lý dữ liệu từ form nhập tay"""
-    groups = {}
+    """Hàm mới để xử lý dữ liệu từ form nhập tay và chuyển đổi thành file Excel"""
     total_items = 0
     try:
-        # Dữ liệu từ form có dạng items[0][ten_mon], items[0][gia]...
-        # Cần một logic để parse chúng thành cấu trúc `groups`
         items = {}
         for key, value in form_data.items():
             if key.startswith('items['):
-                # items[0][ten_mon] -> index=0, field=ten_mon
                 parts = key.replace(']', '').split('[')
                 index = int(parts[1])
                 field = parts[2]
@@ -50,6 +47,7 @@ def parse_manual_form(form_data):
                     items[index] = {}
                 items[index][field] = value
 
+        data = []
         for index in sorted(items.keys()):
             item = items[index]
             ten_mon = item.get('ten_mon', '').strip()
@@ -58,16 +56,10 @@ def parse_manual_form(form_data):
             if not ten_mon or not gia_str:
                 continue
 
-            nhom = item.get('nhom', 'Món khác').strip()
-            if not nhom:
-                nhom = 'Món khác'
-
-            if nhom not in groups:
-                groups[nhom] = []
-
-            groups[nhom].append({
-                'ten': ten_mon,
-                'gia': int(gia_str),
+            data.append({
+                'ten_mon': ten_mon,
+                'gia': gia_str,
+                'nhom': item.get('nhom', 'Món khác').strip() or 'Món khác',
                 'mo_ta': item.get('mo_ta', '').strip(),
                 'ghi_chu': item.get('ghi_chu', '').strip(),
             })
@@ -76,7 +68,12 @@ def parse_manual_form(form_data):
         if total_items == 0:
             return {'success': False, 'error': 'Bạn chưa nhập món ăn nào.'}
 
-        return {'success': True, 'groups': groups, 'total_items': total_items}
+        df = pd.DataFrame(data)
+        filename = f'manual_{uuid.uuid4().hex}.xlsx'
+        upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        df.to_excel(upload_path, index=False)
+
+        return {'success': True, 'filename': filename}
     except Exception as e:
         return {'success': False, 'error': f'Lỗi xử lý dữ liệu nhập tay: {e}'}
 
@@ -110,11 +107,18 @@ def upload():
         menu_data = parse_excel(upload_path)
     
     elif input_method == 'manual':
-        menu_data = parse_manual_form(request.form)
+        result = parse_manual_form(request.form)
+        if not result['success']:
+            flash(result['error'], 'error')
+            return redirect(url_for('main.index'))
+            
+        filename = result['filename']
+        upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        menu_data = parse_excel(upload_path)
 
 
-    if not menu_data['success']:
-        flash(menu_data['error'], 'error')
+    if not menu_data.get('success'):
+        flash(menu_data.get('error', 'Lỗi không xác định'), 'error')
         return redirect(url_for('main.index'))
 
     pdf_file = render_menu_pdf(menu_data, shop_name, template_key, watermark=True)
@@ -142,7 +146,8 @@ def serve_preview(filename):
 
 @main.route('/download-sample')
 def download_sample():
-    return send_from_directory('app/static', 'sample.xlsx', as_attachment=True)
+    # Sử dụng current_app.static_folder để lấy path tuyệt đối chuẩn trên VPS
+    return send_from_directory(current_app.static_folder, 'sample.xlsx', as_attachment=True)
 
 # ---- Tích hợp PayOS (VietQR) ----
 @main.route('/payment/payos/<int:order_id>', methods=['POST'])

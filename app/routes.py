@@ -32,29 +32,87 @@ def get_order_token(order_id):
     secret = current_app.secret_key.encode('utf-8') if current_app.secret_key else b'dev-secret'
     return hmac.new(secret, str(order_id).encode('utf-8'), hashlib.sha256).hexdigest()[:16]
 
+def parse_manual_form(form_data):
+    """Hàm mới để xử lý dữ liệu từ form nhập tay"""
+    groups = {}
+    total_items = 0
+    try:
+        # Dữ liệu từ form có dạng items[0][ten_mon], items[0][gia]...
+        # Cần một logic để parse chúng thành cấu trúc `groups`
+        items = {}
+        for key, value in form_data.items():
+            if key.startswith('items['):
+                # items[0][ten_mon] -> index=0, field=ten_mon
+                parts = key.replace(']', '').split('[')
+                index = int(parts[1])
+                field = parts[2]
+                if index not in items:
+                    items[index] = {}
+                items[index][field] = value
+
+        for index in sorted(items.keys()):
+            item = items[index]
+            ten_mon = item.get('ten_mon', '').strip()
+            gia_str = item.get('gia', '0').strip()
+
+            if not ten_mon or not gia_str:
+                continue
+
+            nhom = item.get('nhom', 'Món khác').strip()
+            if not nhom:
+                nhom = 'Món khác'
+
+            if nhom not in groups:
+                groups[nhom] = []
+
+            groups[nhom].append({
+                'ten': ten_mon,
+                'gia': int(gia_str),
+                'mo_ta': item.get('mo_ta', '').strip(),
+                'ghi_chu': item.get('ghi_chu', '').strip(),
+            })
+            total_items += 1
+        
+        if total_items == 0:
+            return {'success': False, 'error': 'Bạn chưa nhập món ăn nào.'}
+
+        return {'success': True, 'groups': groups, 'total_items': total_items}
+    except Exception as e:
+        return {'success': False, 'error': f'Lỗi xử lý dữ liệu nhập tay: {e}'}
+
 @main.route('/')
 def index():
     return render_template('index.html')
 
 @main.route('/upload', methods=['POST'])
 def upload():
-    if 'excel_file' not in request.files:
-        flash('Chưa chọn file!', 'error')
-        return redirect(url_for('main.index'))
-
-    file = request.files['excel_file']
     shop_name = request.form.get('shop_name', 'Quán của tôi').strip()
     template_key = request.form.get('template', 'classic')
+    input_method = request.form.get('input_method', 'excel')
+    
+    filename = None
+    menu_data = {}
 
-    if not file or not allowed_file(file.filename):
-        flash('Chỉ chấp nhận file .xlsx hoặc .xls', 'error')
-        return redirect(url_for('main.index'))
+    if input_method == 'excel':
+        if 'excel_file' not in request.files:
+            flash('Chưa chọn file!', 'error')
+            return redirect(url_for('main.index'))
 
-    filename = f'{uuid.uuid4().hex}_{secure_filename(file.filename)}'
-    upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
-    file.save(upload_path)
+        file = request.files['excel_file']
 
-    menu_data = parse_excel(upload_path)
+        if not file or not allowed_file(file.filename):
+            flash('Chỉ chấp nhận file .xlsx hoặc .xls', 'error')
+            return redirect(url_for('main.index'))
+
+        filename = f'{uuid.uuid4().hex}_{secure_filename(file.filename)}'
+        upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
+        file.save(upload_path)
+        menu_data = parse_excel(upload_path)
+    
+    elif input_method == 'manual':
+        menu_data = parse_manual_form(request.form)
+
+
     if not menu_data['success']:
         flash(menu_data['error'], 'error')
         return redirect(url_for('main.index'))

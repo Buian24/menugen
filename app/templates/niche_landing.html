@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ page.title }}</title>
+    <meta name="description" content="{{ page.meta_desc }}">
+    
+    <!-- Schema Markup SEO -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "MenuGen AI - {{ page.niche }}",
+      "operatingSystem": "All",
+      "applicationCategory": "DesignApplication",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "VND" }
+    }
+    </script>
+
+    <style>
+        :root {
+            --primary: #d9534f;
+            --primary-hover: #c9302c;
+            --bg-color: #f8f9fa;
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            text-align: center;
+            padding: 40px 15px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+        h1 { color: var(--primary); font-size: 2.2em; margin-bottom: 15px; }
+        p.intro { font-size: 1.1em; color: #555; max-width: 700px; margin: 0 auto 20px; }
+        
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+        .feature-box {
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid var(--primary);
+            flex: 1;
+            min-width: 250px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            font-weight: 500;
+        }
+
+        .action-card {
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            margin-bottom: 40px;
+        }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        input[type="text"], input[type="file"], select {
+            width: 100%; padding: 12px; border: 1px solid #ccc;
+            border-radius: 6px; box-sizing: border-box;
+        }
+        .btn-submit {
+            width: 100%; padding: 15px; font-size: 1.2em; font-weight: bold;
+            background-color: var(--primary); color: white;
+            border: none; border-radius: 6px; cursor: pointer;
+            transition: 0.3s;
+        }
+        .btn-submit:hover { background-color: var(--primary-hover); }
+
+        /* Mẫu minh họa */
+        .sample-image {
+            text-align: center; margin-top: 40px;
+        }
+        .sample-image img {
+            max-width: 100%; border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border: 3px solid #fff;
+        }
+
+        /* Styling cho Tabs và Nhập liệu bằng tay (Đồng bộ với index.html) */
+        .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
+        .tab-btn { flex: 1; padding: 14px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #475569; transition: 0.2s; font-size: 1rem; }
+        .tab-btn.active { background: var(--primary); color: white; }
+        .manual-row { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 16px; border-radius: 8px; margin-bottom: 16px; position: relative; }
+        .manual-row input { margin-bottom: 12px; }
+        .btn-remove { position: absolute; top: 16px; right: 16px; background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        .btn-remove:hover { background: #dc2626; }
+        .btn-add { background: #10b981; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 16px; font-size: 1rem; }
+        .btn-add:hover { background: #059669; }
+        .flex-row { display: flex; gap: 12px; }
+        .flex-row > div { flex: 1; }
+        
+        .flash-error { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; }
+
+        @media (max-width: 768px) {
+            h1 { font-size: 1.8em; }
+            .features { flex-direction: column; }
+            .action-card { padding: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>{{ page.h1 }}</h1>
+            <p class="intro">{{ page.intro }}</p>
+            
+            <div class="features">
+                <div class="feature-box">❌ Không cần thuê Designer (Tiết kiệm 500k - 1tr)</div>
+                <div class="feature-box">❌ Không cần biết đồ họa (Chỉ cần gõ chữ)</div>
+                <div class="feature-box">⚡ Không cần chờ đợi (Có file in ngay sau 30s)</div>
+            </div>
+        </header>
+
+        <div class="action-card">
+            <h2 style="text-align: center; margin-top: 0;">Tiến hành tạo Menu</h2>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% for category, message in messages %}
+                    <div class="flash-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endwith %}
+
+            <div class="tabs">
+                <button type="button" class="tab-btn active" onclick="switchTab('excel', this)">📤 Tải từ Excel</button>
+                <button type="button" class="tab-btn" onclick="switchTab('manual', this)">✏️ Nhập trực tiếp</button>
+            </div>
+
+            <form action="/upload" method="POST" enctype="multipart/form-data" onsubmit="showLoading()">
+                <input type="hidden" name="input_method" id="input_method" value="excel">
+                <input type="hidden" name="niche_slug" value="{{ page.slug }}">
+                
+                <div class="form-group">
+                    <label>Tên Quán Cafe / Xe Cafe của bạn:</label>
+                    <input type="text" name="shop_name" placeholder="VD: Cafe Muối Chú Long" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Mẫu thiết kế khuyên dùng cho Cafe:</label>
+                    <select name="template">
+                        <option value="cafe_modern">Cafe Hiện Đại (Đen/Trắng tối giản - Khuyên dùng)</option>
+                        <option value="tra_sua">Tươi sáng (Phù hợp xe đẩy, sinh viên)</option>
+                    </select>
+                </div>
+
+                <div id="section-excel">
+                    <div class="form-group">
+                        <label>Tải lên file danh sách món (Excel):</label>
+                        <input type="file" id="excel_file" name="excel_file" accept=".xlsx, .xls" required>
+                        <small style="display:block; margin-top:5px; color:#666;">
+                            Chưa có file mẫu? <a href="/download-sample">Tải file Excel mẫu tại đây</a>
+                        </small>
+                    </div>
+                </div>
+
+                <div id="section-manual" style="display: none; margin-top: 16px;">
+                    <div id="manual-items-container"></div>
+                    <button type="button" class="btn-add" onclick="addManualItem()">+ Thêm món ăn mới</button>
+                </div>
+
+                <button type="submit" id="submit-btn" class="btn-submit">{{ page.cta_text }}</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let itemIndex = 0;
+
+        function switchTab(tab, btnElement) {
+            document.getElementById('input_method').value = tab;
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            if (btnElement) btnElement.classList.add('active');
+            
+            if (tab === 'excel') {
+                document.getElementById('section-excel').style.display = 'block';
+                document.getElementById('section-manual').style.display = 'none';
+                document.getElementById('excel_file').required = true;
+            } else {
+                document.getElementById('section-excel').style.display = 'none';
+                document.getElementById('section-manual').style.display = 'block';
+                document.getElementById('excel_file').required = false;
+                
+                if (document.getElementById('manual-items-container').children.length === 0) {
+                    addManualItem();
+                }
+            }
+        }
+
+        function addManualItem() {
+            const container = document.getElementById('manual-items-container');
+            const row = document.createElement('div');
+            row.className = 'manual-row';
+            row.innerHTML = `
+                <button type="button" class="btn-remove" onclick="this.parentElement.remove()">Xóa</button>
+                <label>Tên món (*)</label>
+                <input type="text" name="items[${itemIndex}][ten_mon]" placeholder="VD: Cafe Muối" required>
+                
+                <div class="flex-row">
+                    <div>
+                        <label>Giá tiền (*)</label>
+                        <input type="number" name="items[${itemIndex}][gia]" placeholder="VD: 25000" required>
+                    </div>
+                    <div>
+                        <label>Nhóm món</label>
+                        <input type="text" name="items[${itemIndex}][nhom]" placeholder="VD: Cà Phê">
+                    </div>
+                </div>
+            `;
+            container.appendChild(row);
+            itemIndex++;
+        }
+        
+        function showLoading() {
+            const btn = document.getElementById('submit-btn');
+            btn.innerText = '⏳ Đang tạo Menu, vui lòng chờ...';
+            btn.style.opacity = '0.8';
+            btn.style.cursor = 'not-allowed';
+        }
+    </script>
+</body>
+</html>

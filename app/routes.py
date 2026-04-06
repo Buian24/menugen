@@ -14,6 +14,7 @@ from .models import db, Order
 from payos import PayOS
 from payos.type import ItemData, PaymentData
 import pandas as pd
+from .data import PAGES_CONTENT
 
 main = Blueprint('main', __name__)
 
@@ -81,11 +82,19 @@ def parse_manual_form(form_data):
 def index():
     return render_template('index.html')
 
+@main.route('/p/<slug>')
+def niche_landing(slug):
+    page_data = PAGES_CONTENT.get(slug)
+    if not page_data:
+        return redirect(url_for('main.index'))
+    return render_template('niche_landing.html', page=page_data)
+
 @main.route('/upload', methods=['POST'])
 def upload():
     shop_name = request.form.get('shop_name', 'Quán của tôi').strip()
     template_key = request.form.get('template', 'classic')
     input_method = request.form.get('input_method', 'excel')
+    niche_slug = request.form.get('niche_slug', 'homepage')
     
     filename = None
     menu_data = {}
@@ -93,13 +102,13 @@ def upload():
     if input_method == 'excel':
         if 'excel_file' not in request.files:
             flash('Chưa chọn file!', 'error')
-            return redirect(url_for('main.index'))
+            return redirect(request.referrer or url_for('main.index'))
 
         file = request.files['excel_file']
 
         if not file or not allowed_file(file.filename):
             flash('Chỉ chấp nhận file .xlsx hoặc .xls', 'error')
-            return redirect(url_for('main.index'))
+            return redirect(request.referrer or url_for('main.index'))
 
         filename = f'{uuid.uuid4().hex}_{secure_filename(file.filename)}'
         upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
@@ -110,7 +119,7 @@ def upload():
         result = parse_manual_form(request.form)
         if not result['success']:
             flash(result['error'], 'error')
-            return redirect(url_for('main.index'))
+            return redirect(request.referrer or url_for('main.index'))
             
         filename = result['filename']
         upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], filename)
@@ -119,7 +128,7 @@ def upload():
 
     if not menu_data.get('success'):
         flash(menu_data.get('error', 'Lỗi không xác định'), 'error')
-        return redirect(url_for('main.index'))
+        return redirect(request.referrer or url_for('main.index'))
 
     pdf_file = render_menu_pdf(menu_data, shop_name, template_key, watermark=True)
 
@@ -128,7 +137,8 @@ def upload():
         shop_name=shop_name,
         template_key=template_key,
         excel_filename=filename,
-        amount=20000
+        amount=20000,
+        niche_slug=niche_slug
     )
     db.session.add(new_order)
     db.session.commit()

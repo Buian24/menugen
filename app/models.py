@@ -14,3 +14,4 @@ class Order(db.Model):
     status = db.Column(db.String(20), default='PENDING') # PENDING, PAID, FAILED
     paid_pdf = db.Column(db.String(255), nullable=True)  # Tên file PDF sau khi thanh toán
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    niche_slug = db.Column(db.String(50), default='homepage')

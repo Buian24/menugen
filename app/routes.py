@@ -1,6 +1,6 @@
 from flask import (Blueprint, render_template, request,
                    redirect, url_for, send_from_directory,
-                   session, jsonify, current_app, flash)
+                   session, jsonify, current_app, flash, Response)
 from werkzeug.utils import secure_filename
 import os
 import uuid
@@ -88,6 +88,22 @@ def niche_landing(slug):
     if not page_data:
         return redirect(url_for('main.index'))
     return render_template('niche_landing.html', page=page_data)
+
+@main.route('/sitemap.xml')
+def sitemap():
+    pages = []
+    # Trang chủ
+    pages.append({'loc': url_for('main.index', _external=True), 'priority': '1.0'})
+    
+    # Tự động lấy tất cả các trang ngách từ data.py
+    for slug in PAGES_CONTENT.keys():
+        pages.append({
+            'loc': url_for('main.niche_landing', slug=slug, _external=True),
+            'priority': '0.8'
+        })
+        
+    sitemap_xml = render_template('sitemap.xml', pages=pages)
+    return Response(sitemap_xml, mimetype='application/xml')
 
 @main.route('/upload', methods=['POST'])
 def upload():

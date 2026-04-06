@@ -112,6 +112,12 @@
         
         .flash-error { background: #fef2f2; border: 1px solid #fca5a5; color: #991b1b; padding: 10px 16px; border-radius: 8px; margin-bottom: 16px; }
 
+        .trust-badge {
+            background: #fff3cd; color: #856404; padding: 12px 20px; border-radius: 8px;
+            text-align: center; font-weight: bold; border: 1px dashed #ffe8a1; margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
         @media (max-width: 768px) {
             h1 { font-size: 1.8em; }
             .features { flex-direction: column; }
@@ -129,6 +135,10 @@
                 <div class="feature-box">❌ Không cần thuê Designer (Tiết kiệm 500k - 1tr)</div>
                 <div class="feature-box">❌ Không cần biết đồ họa (Chỉ cần gõ chữ)</div>
                 <div class="feature-box">⚡ Không cần chờ đợi (Có file in ngay sau 30s)</div>
+            </div>
+            
+            <div class="trust-badge">
+                🖨️ Hỗ trợ xuất file chuẩn khổ A4/A3 - Mang ra tiệm in được ngay, không lo bị mờ!
             </div>
         </header>
 
@@ -158,8 +168,9 @@
                 <div class="form-group">
                     <label>Mẫu thiết kế khuyên dùng cho Cafe:</label>
                     <select name="template">
-                        <option value="cafe_modern">Cafe Hiện Đại (Đen/Trắng tối giản - Khuyên dùng)</option>
-                        <option value="tra_sua">Tươi sáng (Phù hợp xe đẩy, sinh viên)</option>
+                        <option value="cafe_modern">Trắng/Đen Hiện đại (Khuyên dùng quán máy)</option>
+                        <option value="cafe_highlight">Vàng Cam Nổi bật (Tuyệt vời cho Cafe Muối)</option>
+                        <option value="cafe_traditional">Nâu Gỗ Truyền thống (Quán Cafe Phin)</option>
                     </select>
                 </div>
 

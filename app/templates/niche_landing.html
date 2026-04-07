@@ -49,10 +49,9 @@
         p.intro { font-size: 1.1em; color: #555; max-width: 700px; margin: 0 auto 20px; }
         
         .features {
-            display: flex;
-            flex-wrap: wrap;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 15px;
-            justify-content: center;
             margin-bottom: 30px;
         }
         .feature-box {
@@ -60,8 +59,6 @@
             padding: 15px 20px;
             border-radius: 8px;
             border-left: 4px solid var(--primary);
-            flex: 1;
-            min-width: 250px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.05);
             font-weight: 500;
         }
@@ -71,13 +68,14 @@
             padding: 30px;
             border-radius: 12px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 40px;
+            max-width: 800px;
+            margin: 0 auto 40px;
         }
         .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; font-weight: bold; }
-        input[type="text"], input[type="file"], select {
+        label { display: block; margin-bottom: 8px; font-weight: bold; font-size: 16px; }
+        input[type="text"], input[type="file"], input[type="number"], select {
             width: 100%; padding: 12px; border: 1px solid #ccc;
-            border-radius: 6px; box-sizing: border-box;
+            border-radius: 6px; box-sizing: border-box; font-size: 16px;
         }
         .btn-submit {
             width: 100%; padding: 15px; font-size: 1.2em; font-weight: bold;
@@ -101,11 +99,11 @@
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
         .tab-btn { flex: 1; padding: 14px; background: #e2e8f0; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; color: #475569; transition: 0.2s; font-size: 1rem; }
         .tab-btn.active { background: var(--primary); color: white; }
-        .manual-row { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 16px; border-radius: 8px; margin-bottom: 16px; position: relative; }
+        .manual-row { background: #f1f5f9; border: 1px solid #cbd5e1; padding: 12px; border-radius: 8px; margin-bottom: 16px; position: relative; }
         .manual-row input { margin-bottom: 12px; }
-        .btn-remove { position: absolute; top: 16px; right: 16px; background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
+        .btn-remove { position: absolute; top: 12px; right: 12px; background: #ef4444; color: white; border: none; padding: 6px 10px; border-radius: 6px; cursor: pointer; font-size: 0.85rem; font-weight: bold; }
         .btn-remove:hover { background: #dc2626; }
-        .btn-add { background: #10b981; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-bottom: 16px; font-size: 1rem; }
+        .btn-add { background: #10b981; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; margin-top: 15px; margin-bottom: 16px; font-size: 1rem; }
         .btn-add:hover { background: #059669; }
         .flex-row { display: flex; gap: 12px; }
         .flex-row > div { flex: 1; }
@@ -122,6 +120,9 @@
             h1 { font-size: 1.8em; }
             .features { flex-direction: column; }
             .action-card { padding: 20px; }
+            .flex-row { flex-direction: column; gap: 0; }
+            .manual-row input { margin-bottom: 15px; }
+            .btn-remove { top: 10px; right: 10px; }
         }
     </style>
 </head>
@@ -134,7 +135,7 @@
             <div class="features">
                 <div class="feature-box">❌ Không cần thuê Designer (Tiết kiệm 500k - 1tr)</div>
                 <div class="feature-box">❌ Không cần biết đồ họa (Chỉ cần gõ chữ)</div>
-                <div class="feature-box">⚡ Không cần chờ đợi (Có file in ngay sau 30s)</div>
+                <div class="feature-box">⚡ Có file in ngay sau 30s - Thử ngay!</div>
             </div>
             
             <div class="trust-badge">

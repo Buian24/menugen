@@ -78,15 +78,15 @@
   .col-full { width: 100%; }
 
   .group { margin-bottom: {{ group_gap }}px; page-break-inside: avoid; break-inside: avoid; }
-  .group-title { color: #5C4033; font-size: {{ f_group }}px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: {{ pad + 6 }}px; border-bottom: 1px solid #5C4033; padding-bottom: 4px; }
+  .group-title { color: #5C4033; font-size: {{ f_group }}px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: {{ pad + 6 }}px; background: #E8D8C8; padding: 8px 12px; border-left: 4px solid #5C4033; }
 
   .item-wrapper { padding: {{ pad }}px 0; page-break-inside: avoid; break-inside: avoid; }
   .item-top-row { display: flex; justify-content: space-between; align-items: flex-end; }
 
   .item-name { font-weight: 700; color: #5C4033; font-size: {{ f_base }}px; line-height: 1.2; word-break: break-word; padding-right: 15px; }
-  .leader { flex-grow: 1; border-bottom: 1px dotted #5C4033; margin: 0 5px; position: relative; top: -5px; opacity: 0.5; }
+  .leader { flex-grow: 1; border-bottom: 2px dotted #5C4033; margin: 0 10px; position: relative; top: -6px; opacity: 0.6; }
   .item-price { font-weight: 900; color: #5C4033; font-size: {{ f_base }}px; white-space: nowrap; flex-shrink: 0; }
-  .item-desc { color: #8B5A2B; font-size: {{ f_desc - 1 }}px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.3; margin-top: 3px; display: block; padding-right: 15px; }
+  .item-desc { color: #8B5A2B; font-size: {{ f_desc - 2 }}px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; margin-top: 4px; display: block; padding-right: 15px; }
 </style></head><body>
 <div class="header"><h1>{{ shop_name }}</h1><div class="sub">Hương vị tuyệt hảo</div></div>
 
@@ -100,7 +100,7 @@
         {% if current.count < threshold %}
           <div class="group"><div class="group-title">{{ group_name }}</div>
           {% for item in items %}
-            <div class="item-wrapper"><div class="item-top-row"><div class="item-name">{{ item.ten }}</div><div class="leader"></div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}</div></div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div>
+            <div class="item-wrapper"><div class="item-top-row"><div class="item-name">{{ item.ten }}</div><div class="leader"></div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div></div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div>
             {% set current.count = current.count + 1 %}
           {% endfor %}</div>
         {% endif %}
@@ -115,7 +115,7 @@
         {% else %}
           <div class="group"><div class="group-title">{{ group_name }}</div>
           {% for item in items %}
-            <div class="item-wrapper"><div class="item-top-row"><div class="item-name">{{ item.ten }}</div><div class="leader"></div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}</div></div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div>
+            <div class="item-wrapper"><div class="item-top-row"><div class="item-name">{{ item.ten }}</div><div class="leader"></div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div></div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div>
           {% endfor %}</div>
         {% endif %}
       {% endfor %}
@@ -126,7 +126,7 @@
     {% for group_name, items in groups.items() %}
       <div class="group"><div class="group-title">{{ group_name }}</div>
       {% for item in items %}
-        <div class="item-wrapper"><div class="item-top-row"><div class="item-name">{{ item.ten }}</div><div class="leader"></div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}</div></div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div>
+        <div class="item-wrapper"><div class="item-top-row"><div class="item-name">{{ item.ten }}</div><div class="leader"></div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div></div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div>
       {% endfor %}</div>
     {% endfor %}
   </div>

@@ -9,6 +9,7 @@ menugen.db
 # Các file do người dùng tải lên và file kết quả
 uploads/
 outputs/
+Test/
 
 # File biến môi trường
 .env

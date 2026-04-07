@@ -63,4 +63,4 @@ body { font-family: Georgia, serif; background: #1A1008; color: #F0E0B0; font-si
 </style></head><body>
 <div class="header"><div class="orn">✦ ✦ ✦</div><h1>{{ shop_name }}</h1><div class="sub">Fine Dining Menu</div></div>
 {% for group_name, items in groups.items() %}<div class="group"><div class="group-title">{{ group_name }}</div>{% for item in items %}<div class="item"><div class="item-left"><div class="item-name">{{ item.ten }}</div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div></div>{% endfor %}</div>{% endfor %}
-<div class="footer">{% if watermark %}⚠ Bản xem trước – Thanh toán để tải file in chất lượng cao{% else %}Tạo bởi MenuGen AI • menugen.vn{% endif %}</div></body></html>
+<div class="footer">{% if watermark %}⚠ Bản xem trước – Thanh toán để tải file in chất lượng cao{% endif %}</div></body></html>

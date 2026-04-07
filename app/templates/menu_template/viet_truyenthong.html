@@ -16,17 +16,22 @@
 
 {%- if not force_2_col -%}
   {# 1 CỘT #}
-  {%- if stats.total_items <= 10 -%}
+  {%- if stats.total_items <= 6 -%}
+    {%- set f_base = 22 -%}{%- set pad = 16 -%}{%- set group_gap = 35 -%}
+  {%- elif stats.total_items <= 10 -%}
     {%- if stats.total_chars > 400 -%}
-      {# Chữ nhiều -> Giảm cường độ bơm. Font 16 thay vì 18, pad 15 thay vì 20 #}
-      {%- set f_base = 15 -%}{%- set pad = 12 -%}{%- set group_gap = 30 -%}
+      {%- set f_base = 18 -%}{%- set pad = 8 -%}{%- set group_gap = 20 -%}
     {%- else -%}
-      {%- set f_base = 16 -%}{%- set pad = 16 -%}{%- set group_gap = 35 -%}
+      {%- set f_base = 19 -%}{%- set pad = 10 -%}{%- set group_gap = 25 -%}
     {%- endif -%}
   {%- elif stats.total_items <= 15 -%}
-    {%- set f_base = 15 -%}{%- set pad = 12 -%}{%- set group_gap = 30 -%}
+    {%- if stats.total_chars > 600 -%}
+      {%- set f_base = 16 -%}{%- set pad = 6 -%}{%- set group_gap = 15 -%}
+    {%- else -%}
+      {%- set f_base = 17 -%}{%- set pad = 8 -%}{%- set group_gap = 20 -%}
+    {%- endif -%}
   {%- else -%}
-    {%- set f_base = 14 -%}{%- set pad = 10 -%}{%- set group_gap = 25 -%}
+    {%- set f_base = 15 -%}{%- set pad = 5 -%}{%- set group_gap = 15 -%}
   {%- endif -%}
 {%- else -%}
   {# 2 CỘT #}

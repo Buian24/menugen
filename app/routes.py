@@ -159,12 +159,16 @@ def upload():
     db.session.add(new_order)
     db.session.commit()
 
+    # Nút bấm Bypass chỉ hiện khi máy tính hiện tại có biến môi trường LOCAL_DEV_BYPASS=1
+    dev_mode = os.environ.get('LOCAL_DEV_BYPASS') == '1'
+
     return render_template('preview.html',
                            pdf_file=pdf_file,
                            shop_name=shop_name,
                            order_id=new_order.id,
                            total_items=menu_data['total_items'],
-                           groups=menu_data['groups'])
+                           groups=menu_data['groups'],
+                           dev_mode=dev_mode)
 
 @main.route('/preview/<filename>')
 def serve_preview(filename):
@@ -309,3 +313,19 @@ def download_paid(order_id):
         as_attachment=True,
         download_name='menu.pdf'
     )
+
+@main.route('/dev/force-paid/<int:order_id>')
+def dev_force_paid(order_id):
+    """Route dành riêng cho Developer để bypass thanh toán."""
+    if os.environ.get('LOCAL_DEV_BYPASS') != '1':
+        return "Cảnh báo bảo mật: Bạn không có quyền truy cập!", 403
+        
+    order = Order.query.get_or_404(order_id)
+    order.status = 'PAID'
+    
+    upload_path = os.path.join(current_app.config['UPLOAD_FOLDER'], order.excel_filename)
+    menu_data = parse_excel(upload_path)
+    order.paid_pdf = render_menu_pdf(menu_data, order.shop_name, order.template_key, watermark=False)
+    
+    db.session.commit()
+    return redirect(url_for('main.payment_success', order_id=order.id, token=get_order_token(order.id)))

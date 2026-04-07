@@ -61,4 +61,4 @@ body { font-family: 'Courier New', Courier, monospace; background: #2B2B2B; colo
 </style></head><body>
 <div class="header"><h1>{{ shop_name }}</h1><div class="sub">— Thực Đơn —</div></div>
 {% for group_name, items in groups.items() %}<div class="group"><div class="group-title">★ {{ group_name }}</div>{% for item in items %}<div class="item"><span>▶</span><div class="item-left"><div class="item-name">{{ item.ten }}</div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div></div>{% endfor %}</div>{% endfor %}
-<div class="footer">{% if watermark %}⚠ Bản xem trước – Thanh toán để tải file in chất lượng cao{% else %}Tạo bởi MenuGen AI • menugen.vn{% endif %}</div></body></html>
+<div class="footer">{% if watermark %}⚠ Bản xem trước – Thanh toán để tải file in chất lượng cao{% endif %}</div></body></html>

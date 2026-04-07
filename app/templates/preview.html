@@ -127,6 +127,13 @@
         <p style="font-size: 14px; color: #d9534f; margin-top: 15px; background: #fdf2f2; padding: 10px; border-radius: 5px; border: 1px solid #f5c6cb;">
             <strong>Lưu ý:</strong> Dòng chữ "BẢN PREVIEW" và các gạch sọc mờ chỉ là lớp bảo vệ. Chúng sẽ <b>hoàn toàn biến mất</b>, trả lại cho bạn file PDF menu sắc nét, nguyên bản ngay sau khi thanh toán thành công!
         </p>
+
+        {% if dev_mode %}
+        <div style="margin-top: 20px; padding: 15px; background: #fff3cd; border: 2px dashed #ffc107; border-radius: 8px; text-align: center;">
+            <strong style="color: #856404;">🛠️ CHẾ ĐỘ DEVELOPER CHỈ DÀNH CHO AN</strong><br>
+            <a href="/dev/force-paid/{{ order_id }}" style="display: block; margin-top: 10px; padding: 12px; background: #343a40; color: white; text-decoration: none; border-radius: 5px; font-weight: bold;">📥 Bỏ qua thanh toán & Tải Menu PDF</a>
+        </div>
+        {% endif %}
     </div>
 </div>
 

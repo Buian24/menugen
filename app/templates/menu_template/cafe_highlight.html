@@ -15,24 +15,30 @@
 {%- endif -%}
 
 {%- if not force_2_col -%}
-  {%- if stats.total_items <= 10 -%}
+  {%- if stats.total_items <= 6 -%}
+    {%- set f_base = 22 -%}{%- set pad = 16 -%}{%- set group_gap = 35 -%}
+  {%- elif stats.total_items <= 10 -%}
     {%- if stats.total_chars > 400 -%}
-      {%- set f_base = 18 -%}{%- set pad = 12 -%}{%- set group_gap = 30 -%}
+      {%- set f_base = 18 -%}{%- set pad = 8 -%}{%- set group_gap = 20 -%}
     {%- else -%}
-      {%- set f_base = 20 -%}{%- set pad = 16 -%}{%- set group_gap = 35 -%}
+      {%- set f_base = 19 -%}{%- set pad = 10 -%}{%- set group_gap = 25 -%}
     {%- endif -%}
   {%- elif stats.total_items <= 15 -%}
-    {%- set f_base = 18 -%}{%- set pad = 12 -%}{%- set group_gap = 30 -%}
+    {%- if stats.total_chars > 600 -%}
+      {%- set f_base = 16 -%}{%- set pad = 6 -%}{%- set group_gap = 15 -%}
+    {%- else -%}
+      {%- set f_base = 17 -%}{%- set pad = 8 -%}{%- set group_gap = 20 -%}
+    {%- endif -%}
   {%- else -%}
-    {%- set f_base = 16 -%}{%- set pad = 10 -%}{%- set group_gap = 25 -%}
+    {%- set f_base = 15 -%}{%- set pad = 5 -%}{%- set group_gap = 15 -%}
   {%- endif -%}
 {%- else -%}
   {%- set items_per_col = (stats.total_items / 2)|round(0, 'ceil')|int -%}
   {%- if items_per_col <= 12 -%}
     {%- if stats.total_chars > 1000 -%}
-      {%- set f_base = 14 -%}{%- set pad = 6 -%}{%- set group_gap = 45 -%}
+      {%- set f_base = 14 -%}{%- set pad = 8 -%}{%- set group_gap = 35 -%}
     {%- else -%}
-      {%- set f_base = 16 -%}{%- set pad = 14 -%}{%- set group_gap = 30 -%}
+      {%- set f_base = 15 -%}{%- set pad = 15 -%}{%- set group_gap = 45 -%}
     {%- endif -%}
   {%- elif items_per_col <= 16 -%}
     {%- if stats.total_chars > 1200 -%}
@@ -66,7 +72,8 @@
   }
   
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: Helvetica, Arial, sans-serif; background: #FFF3CD; color: #333; border: 3px solid #D9534F; padding: 1.5cm; min-height: calc(100vh - 3cm); }
+  body { font-family: Helvetica, Arial, sans-serif; color: #333; padding: 0.8cm; }
+  .page-border { position: fixed; top: 0; left: 0; right: 0; bottom: 0; border: 3px solid #D9534F; z-index: -1; }
 
   .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 4px solid #D9534F; padding-bottom: 10px; margin-bottom: {{ group_gap + 15 }}px; }
   .header h1 { color: #D9534F; font-size: {{ f_title }}px; font-weight: 900; letter-spacing: -1px; margin: 0; }
@@ -83,11 +90,12 @@
   .item-wrapper { padding: {{ pad }}px 0; page-break-inside: avoid; break-inside: avoid; }
   .item-top-row { display: flex; justify-content: space-between; align-items: flex-end; }
 
-  .item-name { font-weight: 700; color: #333; font-size: {{ f_base }}px; line-height: 1.2; word-break: break-word; padding-right: 15px; }
+  .item-name { font-weight: 700; color: #333; font-size: {{ f_base }}px; line-height: 1.4; word-break: break-word; padding-right: 15px; }
   .leader { flex-grow: 1; border-bottom: 2px dotted #D9534F; margin: 0 10px; position: relative; top: -6px; opacity: 0.6; }
   .item-price { font-weight: 900; color: #D9534F; font-size: {{ f_base }}px; white-space: nowrap; flex-shrink: 0; }
-  .item-desc { color: #856404; font-size: {{ f_desc - 2 }}px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; margin-top: 4px; display: block; padding-right: 15px; }
+  .item-desc { color: #856404; opacity: 0.8; font-size: {{ f_desc - 1 }}px; font-style: italic; letter-spacing: 0.5px; line-height: 1.4; margin-top: 4px; display: block; padding-right: 15px; }
 </style></head><body>
+<div class="page-border"></div>
 <div class="header"><h1>{{ shop_name }}</h1><div class="sub">Hương vị tuyệt hảo</div></div>
 
 {% if force_2_col %}

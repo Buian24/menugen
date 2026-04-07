@@ -40,9 +40,11 @@
 
 {%- set total = namespace(n=0) -%}
 {%- for g, items in groups.items() -%}{%- set total.n = total.n + items|length -%}{%- endfor -%}
-{%- if total.n <= 10 -%}{%- set font_main = 14 -%}{%- set font_desc = 11 -%}{%- set pad = 9 -%}
-{%- elif total.n <= 20 -%}{%- set font_main = 13 -%}{%- set font_desc = 10 -%}{%- set pad = 7 -%}
-{%- elif total.n <= 35 -%}{%- set font_main = 11.5 -%}{%- set font_desc = 9 -%}{%- set pad = 5 -%}
+{%- if total.n <= 6 -%}{%- set font_main = 22 -%}{%- set font_desc = 16 -%}{%- set pad = 24 -%}
+{%- elif total.n <= 10 -%}{%- set font_main = 18 -%}{%- set font_desc = 14 -%}{%- set pad = 16 -%}
+{%- elif total.n <= 15 -%}{%- set font_main = 16 -%}{%- set font_desc = 12 -%}{%- set pad = 12 -%}
+{%- elif total.n <= 20 -%}{%- set font_main = 14 -%}{%- set font_desc = 10 -%}{%- set pad = 9 -%}
+{%- elif total.n <= 35 -%}{%- set font_main = 12 -%}{%- set font_desc = 9 -%}{%- set pad = 5 -%}
 {%- else -%}{%- set font_main = 10 -%}{%- set font_desc = 8 -%}{%- set pad = 3 -%}{%- endif -%}
 
 body { font-family: Arial, sans-serif; background: #FFF0F5; color: #3D1A2E; font-size: {{ font_main }}px; }
@@ -61,4 +63,4 @@ body { font-family: Arial, sans-serif; background: #FFF0F5; color: #3D1A2E; font
 </style></head><body>
 <div class="header"><h1>{{ shop_name }}</h1><div class="sub">☕ Thực Đơn ☕</div></div>
 {% for group_name, items in groups.items() %}<div class="group"><div class="group-title">{{ group_name }}</div>{% for item in items %}<div class="item"><div class="item-left"><div class="item-name">{{ item.ten }}</div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div></div>{% endfor %}</div>{% endfor %}
-<div class="footer">{% if watermark %}⚠ Bản xem trước – Thanh toán để tải file in chất lượng cao{% else %}Tạo bởi MenuGen AI • menugen.vn{% endif %}</div></body></html>
+<div class="footer">{% if watermark %}⚠ Bản xem trước – Thanh toán để tải file in chất lượng cao{% endif %}</div></body></html>

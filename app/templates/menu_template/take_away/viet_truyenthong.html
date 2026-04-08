@@ -1,0 +1,160 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">
+<style>
+{%- set stats = namespace(total_chars=0, total_items=0, total_groups=groups|length) -%}
+{%- for g, items in groups.items() -%}
+  {%- set stats.total_chars = stats.total_chars + g|length * 2 -%}
+  {%- for item in items -%}
+    {%- set stats.total_items = stats.total_items + 1 -%}
+    {%- set stats.total_chars = stats.total_chars + item.ten|length + (item.mo_ta|length if item.mo_ta else 0) -%}
+  {%- endfor -%}
+{%- endfor -%}
+
+{%- set force_2_col = false -%}
+{%- if stats.total_items >= 22 or stats.total_chars > 800 -%}
+  {%- set force_2_col = true -%}
+{%- endif -%}
+
+{%- if not force_2_col -%}
+  {# 1 CỘT #}
+  {%- if stats.total_items <= 6 -%}
+    {%- set f_base = 22 -%}{%- set pad = 16 -%}{%- set group_gap = 35 -%}
+  {%- elif stats.total_items <= 10 -%}
+    {%- if stats.total_chars > 400 -%}
+      {%- set f_base = 18 -%}{%- set pad = 8 -%}{%- set group_gap = 20 -%}
+    {%- else -%}
+      {%- set f_base = 19 -%}{%- set pad = 10 -%}{%- set group_gap = 25 -%}
+    {%- endif -%}
+  {%- elif stats.total_items <= 15 -%}
+    {%- if stats.total_chars > 600 -%}
+      {%- set f_base = 16 -%}{%- set pad = 6 -%}{%- set group_gap = 15 -%}
+    {%- else -%}
+      {%- set f_base = 17 -%}{%- set pad = 8 -%}{%- set group_gap = 20 -%}
+    {%- endif -%}
+  {%- else -%}
+    {%- set f_base = 15 -%}{%- set pad = 5 -%}{%- set group_gap = 15 -%}
+  {%- endif -%}
+{%- else -%}
+  {# 2 CỘT #}
+  {%- set items_per_col = (stats.total_items / 2)|round(0, 'ceil')|int -%}
+  {%- if items_per_col <= 12 -%}
+    {%- if stats.total_chars > 1000 -%}
+      {%- set f_base = 12 -%}{%- set pad = 6 -%}{%- set group_gap = 45 -%}
+    {%- else -%}
+      {%- set f_base = 14 -%}{%- set pad = 14 -%}{%- set group_gap = 30 -%}
+    {%- endif -%}
+  {%- elif items_per_col <= 16 -%}
+    {%- if stats.total_chars > 1200 -%}
+      {%- set f_base = 11 -%}{%- set pad = 4 -%}{%- set group_gap = 25 -%}
+    {%- else -%}
+      {%- set f_base = 13 -%}{%- set pad = 10 -%}{%- set group_gap = 20 -%}
+    {%- endif -%}
+  {%- elif items_per_col <= 22 -%}
+    {%- if stats.total_chars > 1500 -%}
+      {%- set f_base = 10 -%}{%- set pad = 3 -%}{%- set group_gap = 15 -%}
+    {%- else -%}
+      {%- set f_base = 12 -%}{%- set pad = 8 -%}{%- set group_gap = 18 -%}
+    {%- endif -%}
+  {%- elif items_per_col <= 28 -%}
+    {%- set f_base = 11 -%}{%- set pad = 5 -%}{%- set group_gap = 12 -%}
+  {%- else -%}
+    {%- set f_base = 10 -%}{%- set pad = 2 -%}{%- set group_gap = 8 -%}
+  {%- endif -%}
+{%- endif -%}
+
+{%- set f_title = f_base + 12 -%}
+{%- set f_group = f_base + 3 -%}
+{%- set f_desc = f_base - 2 -%}
+
+  @page { size: A4; margin: 1.2cm 1.5cm; background: #FAF3E0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body { font-family: 'Times New Roman', serif; background: #FAF3E0; color: #3E2723; }
+
+  .header { text-align: center; border-bottom: 2px solid #5D4037; padding-bottom: 8px; margin-bottom: {{ group_gap + 15 }}px; }
+  .header h1 { font-size: {{ f_title }}px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; color: #3E2723; margin: 0; line-height: 1.1; }
+  .header .sub { font-size: {{ f_base }}px; font-style: italic; color: #5D4037; margin-top: 4px; }
+
+  .layout-container { width: 100%; overflow: hidden; }
+  .col-left { float: left; width: 46%; }
+  .col-right { float: right; width: 46%; }
+  .col-full { width: 100%; }
+
+  .group { margin-bottom: {{ group_gap }}px; page-break-inside: avoid; break-inside: avoid; }
+  .group-title { text-align: center; font-size: {{ f_group }}px; font-weight: bold; text-transform: uppercase; color: #FFF; background: #5D4037; padding: 4px 10px; margin-bottom: {{ pad + 4 }}px; border-radius: 4px; }
+
+  .item-wrapper { padding: {{ pad }}px 0; border-bottom: 1px dashed rgba(93,64,55,0.3); page-break-inside: avoid; break-inside: avoid; }
+  .item-top-row { display: flex; justify-content: space-between; align-items: flex-end; }
+
+  .item-name { font-weight: bold; color: #3E2723; font-size: {{ f_base }}px; line-height: 1.2; word-break: break-word; padding-right: 15px; }
+  .leader { flex-grow: 1; position: relative; top: -5px; } 
+  .item-price { font-weight: bold; color: #BF360C; font-size: {{ f_base + 1 }}px; white-space: nowrap; flex-shrink: 0; }
+
+  .item-desc { color: #6D4C41; font-style: italic; font-size: {{ f_desc }}px; line-height: 1.1; margin-top: 2px; display: block; padding-right: 10px; }
+</style></head><body>
+
+<div class="header"><h1>{{ shop_name }}</h1><div class="sub">Hương vị mộc mạc - Đậm đà bản sắc</div></div>
+
+{% if force_2_col %}
+  {% set threshold = (stats.total_items / 2)|round(0, 'ceil')|int %}
+  {% set current = namespace(count=0) %}
+
+  <div class="layout-container">
+    <div class="col-left">
+      {% for group_name, items in groups.items() %}
+        {% if current.count < threshold %}
+          <div class="group"><div class="group-title">{{ group_name }}</div>
+          {% for item in items %}
+            <div class="item-wrapper">
+              <div class="item-top-row">
+                <div class="item-name">{{ item.ten }}</div>
+                <div class="leader"></div>
+                <div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div>
+              </div>
+              {% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}
+            </div>
+            {% set current.count = current.count + 1 %}
+          {% endfor %}</div>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    {% set current2 = namespace(count=0) %}
+    <div class="col-right">
+      {% for group_name, items in groups.items() %}
+        {% if current2.count < threshold %}
+          {% set current2.count = current2.count + items|length %}
+        {% else %}
+          <div class="group"><div class="group-title">{{ group_name }}</div>
+          {% for item in items %}
+            <div class="item-wrapper">
+              <div class="item-top-row">
+                <div class="item-name">{{ item.ten }}</div>
+                <div class="leader"></div>
+                <div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div>
+              </div>
+              {% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}
+            </div>
+          {% endfor %}</div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+{% else %}
+  <div class="col-full">
+    {% for group_name, items in groups.items() %}
+      <div class="group"><div class="group-title">{{ group_name }}</div>
+      {% for item in items %}
+        <div class="item-wrapper">
+          <div class="item-top-row">
+            <div class="item-name">{{ item.ten }}</div>
+            <div class="leader"></div>
+            <div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div>
+          </div>
+          {% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}
+        </div>
+      {% endfor %}</div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+</body></html>

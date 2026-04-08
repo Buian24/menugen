@@ -6,6 +6,12 @@
     <title>{{ page.title }}</title>
     <meta name="description" content="{{ page.meta_desc }}">
     
+    <!-- Open Graph Tags cho Facebook/Zalo -->
+    <meta property="og:title" content="{{ page.title }}">
+    <meta property="og:description" content="{{ page.meta_desc }}">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="{{ url_for('static', filename=page.sample_img, _external=True) }}">
+    
     <!-- Schema Markup SEO -->
     <script type="application/ld+json">
     {
@@ -94,6 +100,11 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
             border: 3px solid #fff;
         }
+        
+        /* SEO Content CSS */
+        .seo-article { background: #fff; padding: 30px; border-radius: 12px; margin-top: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .seo-article h2 { color: var(--primary); margin-top: 25px; font-size: 1.5em; }
+        .seo-article p, .seo-article li { font-size: 1.05em; color: #444; line-height: 1.7; margin-bottom: 12px; }
 
         /* Styling cho Tabs và Nhập liệu bằng tay (Đồng bộ với index.html) */
         .tabs { display: flex; gap: 10px; margin-bottom: 20px; }
@@ -141,6 +152,10 @@
             <div class="trust-badge">
                 🖨️ Hỗ trợ xuất file chuẩn khổ A4/A3 - Mang ra tiệm in được ngay, không lo bị mờ!
             </div>
+            
+            <div style="font-size: 1.05em; color: #28a745; font-weight: bold; margin-top: 10px;">
+                ⭐ Đã có hơn 1,000+ chủ quán tin dùng MenuGen AI
+            </div>
         </header>
 
         <div class="action-card">
@@ -169,13 +184,13 @@
                 <div class="form-group">
                     <label>Mẫu thiết kế khuyên dùng cho Cafe:</label>
                     <select name="template">
-                        <option value="cafe_modern">Trắng/Đen Hiện đại (Khuyên dùng quán máy)</option>
-                        <option value="cafe_highlight">Vàng Cam Nổi bật (Tuyệt vời cho Cafe Muối)</option>
-                        <option value="cafe_traditional">Nâu Gỗ Truyền thống (Quán Cafe Phin)</option>
-                        <option value="tra_sua">Xanh/Hồng Tươi Sáng (Xe Trà Sữa, Sinh Tố)</option>
-                        <option value="street">Cam/Đen Đường Phố (Menu dán xe cá tính)</option>
-                        <option value="pastel">Hồng Pastel (Phong cách dễ thương, ngọt ngào)</option>
-                        <option value="viet_truyenthong">Kem/Nâu Tối Giản (Phong cách Vintage)</option>
+                        <option value="take_away/cafe_modern">Trắng/Đen Hiện đại (Khuyên dùng quán máy)</option>
+                        <option value="take_away/cafe_highlight">Vàng Cam Nổi bật (Tuyệt vời cho Cafe Muối)</option>
+                        <option value="take_away/cafe_traditional">Nâu Gỗ Truyền thống (Quán Cafe Phin)</option>
+                        <option value="take_away/tra_sua">Xanh/Hồng Tươi Sáng (Xe Trà Sữa, Sinh Tố)</option>
+                        <option value="take_away/street">Cam/Đen Đường Phố (Menu dán xe cá tính)</option>
+                        <option value="take_away/pastel">Hồng Pastel (Phong cách dễ thương, ngọt ngào)</option>
+                        <option value="take_away/viet_truyenthong">Kem/Nâu Tối Giản (Phong cách Vintage)</option>
                     </select>
                 </div>
 
@@ -183,9 +198,9 @@
                     <div class="form-group">
                         <label>Tải lên file danh sách món (Excel):</label>
                         <input type="file" id="excel_file" name="excel_file" accept=".xlsx, .xls" required>
-                        <small style="display:block; margin-top:5px; color:#666;">
-                            Chưa có file mẫu? <a href="/download-sample">Tải file Excel mẫu tại đây</a>
-                        </small>
+                        <div style="margin-top: 12px;">
+                            <a href="/download-sample" style="display:inline-block; padding: 8px 15px; background: #e2e8f0; color: #1e293b; text-decoration: none; border-radius: 5px; font-weight: bold; border: 1px solid #cbd5e1; font-size: 0.9em;">📥 Tải file Excel mẫu tại đây</a>
+                        </div>
                     </div>
                 </div>
 
@@ -197,6 +212,11 @@
                 <button type="submit" id="submit-btn" class="btn-submit">{{ page.cta_text }}</button>
             </form>
         </div>
+        
+        <!-- Render SEO Content tự động từ data.py -->
+        {% if page.seo_content %}
+            {{ page.seo_content | safe }}
+        {% endif %}
     </div>
 
     <script>

@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="vi"><head><meta charset="UTF-8">
+<style>
+@page { size: A4; margin: 1.5cm; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* WATERMARK: lặp lại toàn trang, không thể tránh */
+  {% if watermark %}
+  body::before {
+    content: "PREVIEW · CHƯA THANH TOÁN · PREVIEW · CHƯA THANH TOÁN · PREVIEW";
+    position: fixed;
+    top: 0; left: -20%; right: 0; bottom: 0;
+    width: 140%; height: 100%;
+    font-size: 18px; font-weight: 900;
+    color: rgba(200, 30, 30, 0.13);
+    transform: rotate(-35deg);
+    letter-spacing: 6px;
+    pointer-events: none; z-index: 9999;
+    white-space: pre-wrap;
+    word-break: break-all;
+    line-height: 3.2;
+    display: flex; align-items: center;
+    overflow: hidden;
+  }
+  body::after {
+    content: "⛔ MENUGEN.VN ⛔ PREVIEW ⛔ MENUGEN.VN ⛔ PREVIEW ⛔ MENUGEN.VN ⛔ PREVIEW ⛔ MENUGEN.VN ⛔ PREVIEW ⛔ MENUGEN.VN ⛔ PREVIEW ⛔";
+    position: fixed;
+    top: 50%; left: -20%;
+    width: 140%;
+    font-size: 14px; font-weight: 900;
+    color: rgba(200, 30, 30, 0.18);
+    transform: translateY(-50%) rotate(-35deg);
+    letter-spacing: 4px;
+    pointer-events: none; z-index: 9998;
+    white-space: pre-wrap;
+    line-height: 4;
+    word-break: break-all;
+  }
+  {% endif %}
+
+
+{%- set total = namespace(n=0) -%}
+{%- for g, items in groups.items() -%}{%- set total.n = total.n + items|length -%}{%- endfor -%}
+{%- if total.n <= 6 -%}{%- set font_main = 22 -%}{%- set font_desc = 16 -%}{%- set pad = 24 -%}
+{%- elif total.n <= 10 -%}{%- set font_main = 18 -%}{%- set font_desc = 14 -%}{%- set pad = 16 -%}
+{%- elif total.n <= 15 -%}{%- set font_main = 16 -%}{%- set font_desc = 12 -%}{%- set pad = 12 -%}
+{%- elif total.n <= 20 -%}{%- set font_main = 14 -%}{%- set font_desc = 10 -%}{%- set pad = 9 -%}
+{%- elif total.n <= 35 -%}{%- set font_main = 12 -%}{%- set font_desc = 9 -%}{%- set pad = 5 -%}
+{%- else -%}{%- set font_main = 10 -%}{%- set font_desc = 8 -%}{%- set pad = 3 -%}{%- endif -%}
+
+body { font-family: Arial, sans-serif; background: #FFF0F5; color: #3D1A2E; font-size: {{ font_main }}px; }
+.header { text-align: center; padding: 16px 0 14px; margin-bottom: 16px; background: linear-gradient(135deg,#F48FB1,#CE93D8); border-radius: 10px; }
+.header h1 { font-size: {{ [font_main+13, 27]|min }}px; color: white; font-weight: 900; letter-spacing: 4px; text-transform: uppercase; text-shadow: 0 1px 4px rgba(0,0,0,0.18); }
+.header .sub { color: rgba(255,255,255,0.85); font-size: {{ font_desc }}px; letter-spacing: 3px; margin-top: 5px; }
+.group { margin-bottom: 14px; background: white; border-radius: 8px; padding: 10px 12px; border: 1.5px solid #F8BBD0; }
+.group-title { font-size: {{ font_desc + 1 }}px; font-weight: 900; color: #AD1457; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 2px dashed #F48FB1; }
+.item { display: flex; justify-content: space-between; align-items: flex-start; padding: {{ pad - 1 }}px 2px; border-bottom: 1px solid #FCE4EC; }
+.item:last-child { border: none; }
+.item-left { flex: 1; padding-right: 10px; }
+.item-name { font-size: {{ font_main }}px; font-weight: 700; color: #3D1A2E; word-break: break-word; }
+.item-desc { font-size: {{ font_desc - 1 }}px; color: #C48B9F; margin-top: 1px; }
+.item-price { font-size: {{ font_main }}px; font-weight: 900; color: #AD1457; white-space: nowrap; }
+.footer { text-align: center; font-size: 8.5px; color: #F48FB1; margin-top: 12px; }
+</style></head><body>
+<div class="header"><h1>{{ shop_name }}</h1><div class="sub">☕ Thực Đơn ☕</div></div>
+{% for group_name, items in groups.items() %}<div class="group"><div class="group-title">{{ group_name }}</div>{% for item in items %}<div class="item"><div class="item-left"><div class="item-name">{{ item.ten }}</div>{% if item.mo_ta %}<div class="item-desc">{{ item.mo_ta }}</div>{% endif %}</div><div class="item-price">{{ "{:,.0f}".format(item.gia)|replace(",", ".") }}đ</div></div>{% endfor %}</div>{% endfor %}
+<div class="footer">{% if watermark %}⚠ Bản xem trước – Thanh toán để tải file in chất lượng cao{% endif %}</div></body></html>
